@@ -5,8 +5,8 @@ https://help.github.com/articles/splitting-a-subfolder-out-into-a-new-repository
 
 ```
 git-spliter init \
-  --github-topics=kubernetes,addons,pharmer,appscode \
-  --github-username=kube-addons \
+  --repo-dir="/home/tamal/go/src/k8s.io/kubernetes" \
   --pkg-dir="cluster/addons" \
-  --repo-dir="/home/tamal/go/src/k8s.io/kubernetes"
+  --github-username=kube-addons \
+  --github-topics=kubernetes,addons,pharmer,appscode
 ```
