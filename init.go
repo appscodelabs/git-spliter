@@ -23,6 +23,7 @@ func NewCmdInit() *cobra.Command {
 		branchName = "master"
 		ghUser     string
 		ghToken    = os.Getenv("GITHUB_AUTH_TOKEN")
+		// ghLicense  = "apache-2.0" // https://help.github.com/articles/licensing-a-repository/#searching-github-by-license-type
 		ghTopics   []string
 	)
 	cmd := &cobra.Command{
@@ -73,9 +74,15 @@ func NewCmdInit() *cobra.Command {
 
 				r := &github.Repository{
 					Name:        types.StringP(pkg.Name()),
-					Private:     types.FalseP(),
 					Description: types.StringP(desc),
-					Topics:      ghTopics,
+					AutoInit:    types.FalseP(),
+					Private:     types.FalseP(),
+					// HasIssues         *bool   `json:"has_issues,omitempty"`
+					HasWiki:     types.FalseP(),
+					HasPages:    types.FalseP(),
+					HasProjects: types.FalseP(),
+					// HasDownloads      *bool   `json:"has_downloads,omitempty"`
+					// LicenseTemplate: types.StringP(ghLicense),
 				}
 				repo, resp, _ := client.Repositories.Get(ctx, ghUser, *r.Name)
 				if resp.StatusCode != 200 {
@@ -84,6 +91,7 @@ func NewCmdInit() *cobra.Command {
 						return err
 					}
 					fmt.Printf("Successfully created new repo: %v\n", repo.GetSSHURL())
+					client.Repositories.ReplaceAllTopics(ctx, ghUser, *r.Name, ghTopics)
 				} else {
 					fmt.Printf("Repo %s exists\n", repo.GetSSHURL())
 				}
@@ -92,6 +100,10 @@ func NewCmdInit() *cobra.Command {
 				if err != nil {
 					return err
 				}
+				//err = sh.Command("git", "pull", "--rebase", "origin", branchName).Run()
+				//if err != nil {
+				//	return err
+				//}
 				err = sh.Command("git", "push", "-u", "origin", branchName).Run()
 				if err != nil {
 					return err
